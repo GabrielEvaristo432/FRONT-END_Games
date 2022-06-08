@@ -1,21 +1,35 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import url_api from './config'
-import axios from 'axios';
+import { StyleSheet, Text, View, FlatList } from 'react-native';
+import React, { Component } from "react";
+import api from './src/services/api';
+import Games from './src/Games';
 
-export default function App() {
-  
-  async function Listar () {
-    return await axios.get('http://localhost:3012/games')
+class App extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      games: []
+    }
   }
-  
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      {console.log(Listar())}
-      <StatusBar style="auto" />
-    </View>
-  );
+
+  async componentDidMount(){
+    const response = await api.get('/games');
+    this.setState({
+      games: response.data
+    });
+  }
+
+  render(){
+    return(
+      <View>
+        <Text>Jogos</Text>
+        <FlatList
+          data={this.state.games}
+          keyExtractor={this.state.games.nome}
+          
+        />
+      </View>
+    )
+  }
 }
 
 const styles = StyleSheet.create({
@@ -26,3 +40,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+export default App

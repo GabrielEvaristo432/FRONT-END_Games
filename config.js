@@ -1,1 +1,1 @@
-const url_api = 'http://localhost:3012'
+const url_api = 'http:/177.93.70.242:3012/'
