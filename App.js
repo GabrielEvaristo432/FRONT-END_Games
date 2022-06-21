@@ -1,22 +1,182 @@
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import * as React from 'react';
-import { Component, useEffect, useState } from 'react';
+import { Component } from 'react';
 import api from './src/services/api';
 import Games from './src/Games';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import axios from 'axios';
 import { Button } from 'react-native';
+import md5 from 'md5'
 
 class Home extends Component {
   render(){
     return(
       <View style={styles.container}>
         <Text>Bem vindo à Íris</Text>
-        <Button 
-          title="Lista de jogos"
-          onPress={() => this.props.navigation.navigate('Lista de jogos')}
-        />
+        <button
+          style={{
+            fontFamily: "Roboto, sans-serif",
+            color: 'white',
+            backgroundColor: 'rgb(33, 150, 243)',
+            padding: '8px',
+            borderRadius: '4px',
+            borderColor: 'rgb(33, 150, 243)',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+          onClick={() => {
+            this.props.navigation.navigate('Entrar')
+          }}
+        >
+          Entrar
+        </button>
+
+        <button
+          style={{
+            fontFamily: "Roboto, sans-serif",
+            color: 'white',
+            backgroundColor: 'rgb(33, 150, 243)',
+            padding: '8px',
+            borderRadius: '4px',
+            borderColor: 'rgb(33, 150, 243)',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+          onClick={() => {
+            this.props.navigation.navigate('Criar conta')
+          }}
+        >
+          Criar conta
+        </button>
+      </View>
+    )
+  }
+}
+
+class Entrar extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      users: [],
+      login: "",
+      senha: "",
+      erro: ""
+    }
+  }
+
+  async componentDidMount() {
+    const response = await api.get('users');
+    this.setState({
+      users: response.data
+    });
+  }
+
+  async login () {
+    const hash = md5(this.state.senha)
+    const user = {
+      login_: this.state.login,
+      senha_: hash
+    }
+    
+    const verify = this.state.users.map((u) => {
+      if (user.login_ === u.login && user.senha_ === u.senha) {
+        this.props.navigation.navigate('Lista de jogos')
+      } else {
+        this.setState({erro: "E-mail ou senha inválidas, tente novamente"})
+      }
+    })
+    return verify
+  }
+
+  render(){
+    return(
+      <View>
+        <Text>Fazer login</Text>
+        <form
+          // onSubmit={(e) => login(e)}
+          
+        >
+          <div>
+          </div>
+          <label>
+            E-mail
+          </label>
+          <input
+            placeholder="Digite seu e-mail"
+            type="email"
+            required
+            onChange={(e) => this.setState({login: e.target.value})}
+          />
+
+          <label>
+            Senha
+          </label>
+          <input
+            placeholder="Digite sua senha"
+            type="password"
+            required
+            onChange={(e) => this.setState({ senha: e.target.value })}
+          />
+        </form>
+        <button
+          onClick={() => this.login()}
+        >
+          Entrar
+        </button>
+        
+      </View>
+    )
+  }
+}
+
+class CriarConta extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      login: "",
+      senha: ""
+    }
+  }
+
+  async criarConta (){
+    const hash = md5(this.state.senha)
+    await api.post('users', {
+      login: this.state.login,
+      senha: hash
+    })
+    this.props.navigation.navigate('Entrar')
+  }
+  
+  render(){
+    return(
+      <View>
+        <form>
+          <label>
+            E-mail
+          </label>
+          <input
+            placeholder="Digite seu melhor e-mail"
+            required
+            type="email"
+            onChange={(e) => this.setState({ login: e.target.value })}
+          />
+
+          <label>
+            Senha
+          </label>
+          <input
+            placeholder="Crie uma senha"
+            required
+            type="password"
+            onChange={(e) => this.setState({ senha: e.target.value })}
+          />
+        </form>
+
+        <button
+          onClick={() => this.criarConta()}
+        >
+          Criar conta
+        </button>
       </View>
     )
   }
@@ -395,6 +555,8 @@ class App extends Component {
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Entrar" component={Entrar} />
+          <Stack.Screen name="Criar conta" component={CriarConta} />
           <Stack.Screen name="Lista de jogos" component={ListaDeJogos} />
           <Stack.Screen name="Adicione um novo jogo" component={AdicionarJogo} />
           <Stack.Screen name="Atualize o jogo" component={AtualizarJogo} />
