@@ -208,7 +208,6 @@ class ListaDeJogos extends Component {
   render(){
     return(
       <View style={styles.container}>
-        {/* <Text>Jogos</Text> */}
         <table
           style={{
             backgroundColor: '#F5F5F5',
