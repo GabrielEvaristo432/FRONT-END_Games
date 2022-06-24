@@ -1,24 +1,39 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
 import * as React from 'react';
 import { Component } from 'react';
 import api from './src/services/api';
-import Games from './src/Games';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Button } from 'react-native';
 import md5 from 'md5'
 
 class Home extends Component {
   render(){
     return(
-      <View style={styles.container}>
-        <Text>Bem vindo à Íris</Text>
+      <View style={styles.home}>
+        <Text
+          style={{
+            fontSize: '24px',
+            fontFamily: 'Roboto, sans-serif'
+          }}
+        >
+          Bem vindo à Íris
+        </Text>
+        <Text
+          style={{
+            fontSize: '16px',
+            fontFamily: 'Roboto, sans-serif'
+          }}
+        >
+          Veja críticas de seus jogos favoritos
+        </Text>
+
         <button
           style={{
             fontFamily: "Roboto, sans-serif",
             color: 'white',
             backgroundColor: 'rgb(33, 150, 243)',
             padding: '8px',
+            margin: '20px',
             borderRadius: '4px',
             borderColor: 'rgb(33, 150, 243)',
             fontWeight: 'bold',
@@ -82,7 +97,7 @@ class Entrar extends Component {
       if (user.login_ === u.login && user.senha_ === u.senha) {
         this.props.navigation.navigate('Lista de jogos')
       } else {
-        this.setState({erro: "E-mail ou senha inválidas, tente novamente"})
+        this.setState({erro: "E-mail ou senha inválidos, tente novamente"})
       }
     })
     return verify
@@ -90,14 +105,16 @@ class Entrar extends Component {
 
   render(){
     return(
-      <View>
-        <Text>Fazer login</Text>
+      <View style={styles.container}>
         <form
-          // onSubmit={(e) => login(e)}
-          
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '300px',
+            fontFamily: 'Roboto, sans-serif',
+          }}
         >
-          <div>
-          </div>
+          {this.state.erro}
           <label>
             E-mail
           </label>
@@ -105,25 +122,53 @@ class Entrar extends Component {
             placeholder="Digite seu e-mail"
             type="email"
             required
+            style={{
+              padding: '6px',
+              borderColor: 'black',
+              borderRadius: '.4em',
+              borderWidth: '1px',
+              marginTop: '4px',
+            }}
             onChange={(e) => this.setState({login: e.target.value})}
           />
 
-          <label>
+          <label
+            style={{
+              marginTop: '15px',
+            }}
+          >
             Senha
           </label>
           <input
             placeholder="Digite sua senha"
             type="password"
             required
+            style={{
+              padding: '6px',
+              borderColor: 'black',
+              borderRadius: '.4em',
+              borderWidth: '1px',
+              marginTop: '4px',
+              marginBottom: '20px'
+            }}
             onChange={(e) => this.setState({ senha: e.target.value })}
           />
         </form>
         <button
           onClick={() => this.login()}
+          style={{
+            fontFamily: "Roboto, sans-serif",
+            color: 'white',
+            backgroundColor: 'rgb(33, 150, 243)',
+            padding: '8px',
+            borderRadius: '4px',
+            borderColor: 'rgb(33, 150, 243)',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
         >
           Entrar
         </button>
-        
       </View>
     )
   }
@@ -149,8 +194,15 @@ class CriarConta extends Component {
   
   render(){
     return(
-      <View>
-        <form>
+      <View style={styles.container}>
+        <form
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '300px',
+            fontFamily: 'Roboto, sans-serif'
+          }}
+        >
           <label>
             E-mail
           </label>
@@ -158,16 +210,35 @@ class CriarConta extends Component {
             placeholder="Digite seu melhor e-mail"
             required
             type="email"
+            style={{
+              padding: '6px',
+              borderColor: 'black',
+              borderRadius: '.4em',
+              borderWidth: '1px',
+              marginTop: '4px',
+            }}
             onChange={(e) => this.setState({ login: e.target.value })}
           />
 
-          <label>
+          <label
+            style={{
+              marginTop: '15px',
+            }}
+          >
             Senha
           </label>
           <input
             placeholder="Crie uma senha"
             required
             type="password"
+            style={{
+              padding: '6px',
+              borderColor: 'black',
+              borderRadius: '.4em',
+              borderWidth: '1px',
+              marginTop: '4px',
+              marginBottom: '20px'
+            }}
             onChange={(e) => this.setState({ senha: e.target.value })}
           />
         </form>
@@ -186,9 +257,14 @@ class ListaDeJogos extends Component {
   
   constructor(props) {
     super(props);
+    this.forceUpdateHandler = this.forceUpdateHandler.bind(this)
     this.state = {
       games: []
     }
+  }
+
+  forceUpdateHandler(){
+    this.forceUpdate();
   }
 
   async componentDidMount() {
@@ -199,16 +275,12 @@ class ListaDeJogos extends Component {
   }
 
   async excluir (_id) {
-    const response = await api.delete(`games/${_id}`)
-    return response
+    await api.delete(`games/${_id}`).then(this.componentDidMount())
   }
-
-  
 
   render(){
     return(
       <View style={styles.container}>
-        {/* <Text>Jogos</Text> */}
         <table
           style={{
             backgroundColor: '#F5F5F5',
@@ -221,7 +293,7 @@ class ListaDeJogos extends Component {
           <thead
             style={{
               fontFamily: 'Roboto, sans-serif',
-              textAlign: 'left'
+              textAlign: 'left',
             }}
           >
             <tr>
@@ -235,15 +307,18 @@ class ListaDeJogos extends Component {
           <tbody
             style={{
               fontFamily: 'Roboto, sans-serif',
-              textAlign: 'left'
+              textAlign: 'left',
+              fontSize: '14px'
             }}
           >
             {this.state.games.map((g) => (
               <tr key={g._id}>
-                <td style={{ paddingTop: '15px' }} >{g.nome}</td>
+                <td style={{ paddingTop: '15px'}} >{g.nome}</td>
                 <td style={{ paddingTop: '15px' }}>{g.metascore}</td>
                 <td style={{ paddingTop: '15px' }}>{g.userscore}</td>
-                <td style={{ paddingTop: '15px' }}>
+                <td style={{ 
+                  paddingTop: '15px'
+                }}>
                   <button
                     style={{
                       fontFamily: "Roboto, sans-serif",
@@ -253,7 +328,8 @@ class ListaDeJogos extends Component {
                       borderRadius: '4px',
                       borderColor: 'rgb(33, 150, 243)',
                       fontWeight: 'bold',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      marginRight: '8px'
                     }}
                     onClick={() => {
                       this.excluir(g._id)
@@ -261,8 +337,7 @@ class ListaDeJogos extends Component {
                   >
                     Excluir
                   </button>
-                </td>
-                <td style={{ paddingTop: '15px' }} >
+
                   <button
                     style={{
                       fontFamily: "Roboto, sans-serif",
@@ -305,6 +380,23 @@ class ListaDeJogos extends Component {
         >
           Adicionar jogo
         </button>
+
+        <button
+          style={{
+            fontFamily: "Roboto, sans-serif",
+            color: 'white',
+            backgroundColor: 'rgb(33, 150, 243)',
+            padding: '8px',
+            borderRadius: '4px',
+            borderColor: 'rgb(33, 150, 243)',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            marginTop: '20px'
+          }}
+          onClick={() => this.componentDidMount()}
+        >
+          Atualizar lista
+        </button>
       </View>
     )
   }
@@ -340,7 +432,6 @@ class AdicionarJogo extends Component {
             fontFamily: 'Roboto, sans-serif',
             
           }}
-          onSubmit={() => this.adicionar()}
         >
           <label
           >
@@ -405,23 +496,23 @@ class AdicionarJogo extends Component {
               this.setState({ userscore: e.target.value })
             }}
           />
-
-          <button
-            type="submit"
-            style={{
-              fontFamily: "Roboto, sans-serif",
-              color: 'white',
-              backgroundColor: 'rgb(33, 150, 243)',
-              padding: '8px',
-              borderRadius: '4px',
-              borderColor: 'rgb(33, 150, 243)',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            Adicionar
-          </button>
         </form>
+
+        <button
+          onClick={() => this.adicionar().then(this.props.navigation.navigate('Lista de jogos'))}
+          style={{
+            fontFamily: "Roboto, sans-serif",
+            color: 'white',
+            backgroundColor: 'rgb(33, 150, 243)',
+            padding: '8px',
+            borderRadius: '4px',
+            borderColor: 'rgb(33, 150, 243)',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+        >
+          Adicionar
+        </button>
       </View>
     )
   }
@@ -437,16 +528,12 @@ class AtualizarJogo extends Component {
     }
   }
 
-
-
   async atualizar(id) {
-
-    const response = await api.put(`games/${id}`, {
+    await api.put(`games/${id}`, {
       nome: this.state.nome,
       metascore: this.state.metascore,
       userscore: this.state.userscore
-    })
-    return response
+    }).then(this.props.navigation.navigate('Lista de jogos'))
   }
   
   render(){
@@ -460,7 +547,6 @@ class AtualizarJogo extends Component {
             fontFamily: 'Roboto, sans-serif',
 
           }}
-          onSubmit={() => this.atualizar(this.props.route.params._id)}
         >
           <label>
             Nome
@@ -523,24 +609,23 @@ class AtualizarJogo extends Component {
               this.setState({ userscore: e.target.value })
             }}
           />
-
-          <button
-            type="submit"
-            style={{
-              fontFamily: "Roboto, sans-serif",
-              color: 'white',
-              backgroundColor: 'rgb(33, 150, 243)',
-              padding: '8px',
-              borderRadius: '4px',
-              borderColor: 'rgb(33, 150, 243)',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            Atualizar
-          </button>
         </form>
-        
+
+        <button
+          onClick={() => this.atualizar(this.props.route.params._id)}
+          style={{
+            fontFamily: "Roboto, sans-serif",
+            color: 'white',
+            backgroundColor: 'rgb(33, 150, 243)',
+            padding: '8px',
+            borderRadius: '4px',
+            borderColor: 'rgb(33, 150, 243)',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+        >
+          Atualizar
+        </button>
       </View>
       
     )
@@ -573,49 +658,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tableHeader: {
-
-  },
-  tableCell: {
-    margin: '3px'
+  home: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
   }
 });
 
 export default App
-
-// const Stack = createNativeStackNavigator();
-
-// function Jogos () {
-//   return(
-//     <View style={styles.container}>
-//       <Text>Jogos</Text>
-      
-//     </View>
-//   )
-// }
-
-// function App () {
-  
-//   const[games, setGames] = useState()
-
-//   useEffect(() => {
-//     async function ListarGames() {
-//       const response = await axios.get('http://localhost:3012/games');
-//       const jogo = await response.data;
-//       return jogo;
-//     }
-//     ListarGames();
-//   }, [])
-  
-  
-
-//   return(
-//     <NavigationContainer>
-//       <Stack.Navigator>
-//         {/* <Stack.Screen name="Home" component={Home} /> */}
-//         {console.log(games)}
-//         <Stack.Screen name="Jogos" component={Jogos} />
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//   )
-// }
