@@ -257,14 +257,9 @@ class ListaDeJogos extends Component {
   
   constructor(props) {
     super(props);
-    this.forceUpdateHandler = this.forceUpdateHandler.bind(this)
     this.state = {
       games: []
     }
-  }
-
-  forceUpdateHandler(){
-    this.forceUpdate();
   }
 
   async componentDidMount() {
